@@ -14,10 +14,10 @@
 #define A1_GPIO 23      // address input
 #define A2_GPIO 24      // address input
 
-#define SENSOR_1 17
-#define SENSOR_2 18
-#define SENSOR_3 19
-#define SENSOR_4 20
+#define STOP_SENSOR_1_LEFT      17
+#define STOP_SENSOR_1_RIGHT     18
+#define STOP_SENSOR_2_LEFT      19
+#define STOP_SENSOR_2_RIGHT     20
 
 #define USLEEP_TIME 10
 
@@ -54,6 +54,7 @@ int motor_clockwise(MOTOR motor);
 int motor_unclockwise(MOTOR motor);
 
 int stepm_74hc_disable(MOTOR motor);
+int stepm_74hc_step(MOTOR motor, DIRECTION dir);
 
 int stepm_74hc_init_motors(unsigned motor_count, unsigned gpio_a, unsigned gpio_b, unsigned gpio_c, unsigned gpio_data_in);
 

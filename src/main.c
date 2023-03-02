@@ -15,14 +15,10 @@ int main(int argc, char *argv[]) {
 
     int count = (int)atoi(argv[3]);
     MOTOR motor = (MOTOR)atoi(argv[1]);
+    DIRECTION dir = (DIRECTION)atoi(argv[2]);
 
-    for (int i = 0; i < count; ++i)
-    {
-        if (argv[2]) {
-            motor_clockwise(motor);
-        } else {
-            motor_unclockwise(motor);
-        }
+    for (int i = 0; i < count; ++i) {
+        stepm_74hc_step(motor, dir);
     }
 
     stepm_74hc_disable(MOTOR_HORIZONTAL);

@@ -130,11 +130,11 @@ int stepm_74hc_calibrate(MOTOR motor) {
     while (!done) {
         int left_old_status, left_new_status = 0;
         int right_old_status, right_new_status = 0;
-        gpio_get_value(sensors[motor][0], left_old_status);
-        gpio_get_value(sensors[motor][1], right_old_status);
+        gpio_get_value(sensors[motor][0], &left_old_status);
+        gpio_get_value(sensors[motor][1], &right_old_status);
         stepm_74hc_step(motor, DIRECTION_CLOCKWISE);
-        gpio_get_value(sensors[motor][0], left_new_status);
-        gpio_get_value(sensors[motor][1], right_new_status);
+        gpio_get_value(sensors[motor][0], &left_new_status);
+        gpio_get_value(sensors[motor][1], &right_new_status);
         if ((left_old_status != left_new_status) || (right_old_status != right_new_status)) {
             done = 1;
         }
@@ -145,11 +145,11 @@ int stepm_74hc_calibrate(MOTOR motor) {
         counter++;
         int left_old_status, left_new_status = 0;
         int right_old_status, right_new_status = 0;
-        gpio_get_value(sensors[motor][0], left_old_status);
-        gpio_get_value(sensors[motor][1], right_old_status);
+        gpio_get_value(sensors[motor][0], &left_old_status);
+        gpio_get_value(sensors[motor][1], &right_old_status);
         stepm_74hc_step(motor, DIRECTION_UCLOCKWISE);
-        gpio_get_value(sensors[motor][0], left_new_status);
-        gpio_get_value(sensors[motor][1], right_new_status);
+        gpio_get_value(sensors[motor][0], &left_new_status);
+        gpio_get_value(sensors[motor][1], &right_new_status);
         if ((left_old_status != left_new_status) || (right_old_status != right_new_status)) {
             done = 1;
         }
