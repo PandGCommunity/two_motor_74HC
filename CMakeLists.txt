@@ -11,6 +11,7 @@ include_directories(
 add_definitions(
     -D_DEFAULT_SOURCE
 )
+add_link_options(-Wall -g -Wl,-gc-sections)
 
 set (MAIN_SRC
     ${PROJECT_SOURCE_DIR}/src/main.c

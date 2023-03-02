@@ -3,6 +3,7 @@
 
 #include "gpio.h"
 #include <unistd.h>
+#include <stdlib.h>
 
 #define LE_GPIO 0       // latch enable input (active LOW)
 #define MR_GPIO 0       // conditional reset input (active LOW)
@@ -13,12 +14,28 @@
 #define A1_GPIO 23      // address input
 #define A2_GPIO 24      // address input
 
+#define SENSOR_1 17
+#define SENSOR_2 18
+#define SENSOR_3 19
+#define SENSOR_4 20
+
 #define USLEEP_TIME 10
 
 typedef enum motor_t {
     MOTOR_VERTICAL = 0,
     MOTOR_HORIZONTAL = 1
 } MOTOR;
+
+typedef enum direction_t {
+    DIRECTION_CLOCKWISE = 0,
+    DIRECTION_UCLOCKWISE = 1
+} DIRECTION;
+
+typedef enum errors_t {
+    SUCCESS = 0,
+    ERROR_INVALID_MOTOR = -1,
+    ERROR_INVALID_DIRECTION = -2
+} errors;
 
 
 // A0 A1 A2 = Q0 Q1 Q2 Q3 Q4 Q5 Q6 Q7
@@ -44,7 +61,7 @@ int stepm_74hc_init_pawls(unsigned motor, unsigned gpio_margin_A, unsigned gpio_
 
 int stepm_74hc_rotate(unsigned motor, int direction, unsigned steps_count);
 
-int stepm_74hc_calibrate(unsigned motor);
+int stepm_74hc_calibrate(MOTOR motor);
 
 int stepm_74hc_get_max_position(unsigned motor);
 int stepm_74hc_get_cur_position(unsigned motor);
