@@ -1,6 +1,9 @@
 #include "stepm_74hc.h"
+#include "app_version.h"
 
 int main(int argc, char *argv[]) {
+    printf("[%s] version: %s\n", argv[0], APP_VERSION);
+
     for (int i = 0; i < argc; ++i)
         printf("[%d]: %s\n", i, argv[i]);
 
@@ -12,11 +15,12 @@ int main(int argc, char *argv[]) {
     int count = (int)atoi(argv[3]);
     MOTOR motor = (MOTOR)atoi(argv[1]);
     DIRECTION dir = (DIRECTION)atoi(argv[2]);
-    stepm_74hc_check_motor(motor);
 
     printf("count: %d\n", count);
     printf("motor: %d\n", motor);
     printf("dir:   %d\n", dir);
+
+    stepm_74hc_check_motor(motor);
 
     stepm_74hc_gpio_init();
     stepm_74hc_disable(MOTOR_HORIZONTAL);

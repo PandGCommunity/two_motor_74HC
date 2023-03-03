@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_policy(SET CMP0054 NEW)
 
 set(CMAKE_C_STANDARD 99)
 set (PROJECT two_motor_74HC)
@@ -20,6 +21,16 @@ set (MAIN_SRC
 )
 
 add_executable(${PROJECT} ${MAIN_SRC})
+
+find_package(Git)
+add_custom_target(version
+  ${CMAKE_COMMAND} -D SRC=${PROJECT_SOURCE_DIR}/app_version.h.in
+                   -D DST=${PROJECT_SOURCE_DIR}/src/app_version.h
+                   -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+                   -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
+  )
+
+add_dependencies(${PROJECT} version)
 
 target_link_libraries(${PROJECT}
 
