@@ -9,20 +9,25 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    stepm_74hc_gpio_init();
-    stepm_74hc_disable(MOTOR_HORIZONTAL);
-    stepm_74hc_disable(MOTOR_VERTICAL);
-
     int count = (int)atoi(argv[3]);
     MOTOR motor = (MOTOR)atoi(argv[1]);
     DIRECTION dir = (DIRECTION)atoi(argv[2]);
+    stepm_74hc_check_motor(motor);
+
+    printf("count: %d\n", count);
+    printf("motor: %d\n", motor);
+    printf("dir:   %d\n", dir);
+
+    stepm_74hc_gpio_init();
+    stepm_74hc_disable(MOTOR_HORIZONTAL);
+    stepm_74hc_disable(MOTOR_VERTICAL);
 
     for (int i = 0; i < count; ++i) {
         stepm_74hc_step(motor, dir);
     }
 
-    stepm_74hc_disable(MOTOR_HORIZONTAL);
-    stepm_74hc_disable(MOTOR_VERTICAL);
+    // stepm_74hc_disable(MOTOR_HORIZONTAL);
+    // stepm_74hc_disable(MOTOR_VERTICAL);
     stepm_74hc_gpio_deinit();
     return 0;
 }

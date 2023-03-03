@@ -1,7 +1,7 @@
 #include <stdio.h>
 // #include <stdlib.h>
 #include <string.h>
-// #include <errno.h>
+#include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
 // #include <poll.h>
@@ -16,6 +16,7 @@
  /****************************************************************
  * Definitions
  ****************************************************************/
+int gpio_check(unsigned int gpio);
 int gpio_enable(unsigned int gpio);
 int gpio_disable(unsigned int gpio);
 int gpio_set_dir(unsigned int gpio, unsigned int out_flag);

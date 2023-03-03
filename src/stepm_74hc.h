@@ -35,7 +35,7 @@ typedef enum errors_t {
     SUCCESS = 0,
     ERROR_INVALID_MOTOR = -1,
     ERROR_INVALID_DIRECTION = -2
-} errors;
+} ERROR;
 
 
 // A0 A1 A2 = Q0 Q1 Q2 Q3 Q4 Q5 Q6 Q7
@@ -48,6 +48,7 @@ typedef enum errors_t {
 // L  H  H  = L  L  L  L  L  L  H  L
 // H  H  H  = L  L  L  L  L  L  L  H
 
+ERROR stepm_74hc_check_motor(MOTOR motor);
 int stepm_74hc_gpio_init();
 int stepm_74hc_gpio_deinit();
 int motor_clockwise(MOTOR motor);

@@ -1,10 +1,25 @@
 #include "gpio.h"
 
 /****************************************************************
+ * gpio_check
+ ****************************************************************/
+int gpio_check(unsigned int gpio) {
+    int fd, len;
+    char buf[MAX_BUF];
+
+    len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR  "/gpio%d", gpio);
+
+    if (access(buf, F_OK) == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+/****************************************************************
  * gpio_enable
  ****************************************************************/
-int gpio_enable(unsigned int gpio)
-{
+int gpio_enable(unsigned int gpio) {
     int fd, len;
     char buf[MAX_BUF];
 
@@ -24,8 +39,7 @@ int gpio_enable(unsigned int gpio)
 /****************************************************************
  * gpio_disable
  ****************************************************************/
-int gpio_disable(unsigned int gpio)
-{
+int gpio_disable(unsigned int gpio) {
     int fd, len;
     char buf[MAX_BUF];
 
@@ -44,8 +58,7 @@ int gpio_disable(unsigned int gpio)
 /****************************************************************
  * gpio_set_dir
  ****************************************************************/
-int gpio_set_dir(unsigned int gpio, unsigned int out_flag)
-{
+int gpio_set_dir(unsigned int gpio, unsigned int out_flag) {
     int fd, len;
     char buf[MAX_BUF];
 
@@ -69,8 +82,7 @@ int gpio_set_dir(unsigned int gpio, unsigned int out_flag)
 /****************************************************************
  * gpio_set_active_low
  ****************************************************************/
-int gpio_set_active_low(unsigned int gpio, unsigned int mode_flag)
-{
+int gpio_set_active_low(unsigned int gpio, unsigned int mode_flag) {
     int fd, len;
     char buf[MAX_BUF];
 
@@ -94,8 +106,7 @@ int gpio_set_active_low(unsigned int gpio, unsigned int mode_flag)
 /****************************************************************
  * gpio_set_value
  ****************************************************************/
-int gpio_set_value(unsigned int gpio, unsigned int value)
-{
+int gpio_set_value(unsigned int gpio, unsigned int value) {
     int fd, len;
     char buf[MAX_BUF];
 
@@ -119,8 +130,7 @@ int gpio_set_value(unsigned int gpio, unsigned int value)
 /****************************************************************
  * gpio_get_value
  ****************************************************************/
-int gpio_get_value(unsigned int gpio, unsigned int *value)
-{
+int gpio_get_value(unsigned int gpio, unsigned int *value) {
     int fd, len;
     char buf[MAX_BUF];
     char ch;
@@ -150,8 +160,7 @@ int gpio_get_value(unsigned int gpio, unsigned int *value)
  * gpio_set_edge
  ****************************************************************/
 
-int gpio_set_edge(unsigned int gpio, char *edge)
-{
+int gpio_set_edge(unsigned int gpio, char *edge) {
     int fd, len;
     char buf[MAX_BUF];
 
@@ -172,8 +181,7 @@ int gpio_set_edge(unsigned int gpio, char *edge)
  * gpio_fd_open
  ****************************************************************/
 
-int gpio_fd_open(unsigned int gpio)
-{
+int gpio_fd_open(unsigned int gpio) {
     int fd, len;
     char buf[MAX_BUF];
 
@@ -190,7 +198,6 @@ int gpio_fd_open(unsigned int gpio)
  * gpio_fd_close
  ****************************************************************/
 
-int gpio_fd_close(int fd)
-{
+int gpio_fd_close(int fd) {
     return close(fd);
 }
