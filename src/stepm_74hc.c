@@ -61,10 +61,6 @@ static inline int X1(MOTOR motor) {
 static inline int X2(MOTOR motor) {
     // L  H  H  = L  L  L  L  L  L  H  L for MOTOR_HORIZONTAL
     // L  H  L  = L  L  H  L  L  L  L  L for MOTOR_VERTICAL
-    if ((motor != MOTOR_VERTICAL) || (motor != MOTOR_HORIZONTAL)) {
-        printf("%d: Invalid motor\n", __LINE__);
-        return ERROR_INVALID_MOTOR;
-    }
     gpio_set_value(DATA_GPIO, 0);   // echo "0" > /sys/class/gpio/gpio26/value
     gpio_set_value(A0_GPIO, 0);     // echo "0" > /sys/class/gpio/gpio22/value
     gpio_set_value(A1_GPIO, 1);     // echo "1" > /sys/class/gpio/gpio23/value
@@ -77,10 +73,6 @@ static inline int X2(MOTOR motor) {
 static inline int X3(MOTOR motor) {
     // H  L  H  = L  L  L  L  L  H  L  L for MOTOR_HORIZONTAL
     // H  L  L  = L  H  L  L  L  L  L  L for MOTOR_VERTICAL
-    if ((motor != MOTOR_VERTICAL) || (motor != MOTOR_HORIZONTAL)) {
-        printf("%d: Invalid motor\n", __LINE__);
-        return ERROR_INVALID_MOTOR;
-    }
     gpio_set_value(DATA_GPIO, 0);   // echo "0" > /sys/class/gpio/gpio26/value
     gpio_set_value(A0_GPIO, 1);     // echo "1" > /sys/class/gpio/gpio22/value
     gpio_set_value(A1_GPIO, 0);     // echo "0" > /sys/class/gpio/gpio23/value
@@ -93,10 +85,6 @@ static inline int X3(MOTOR motor) {
 static inline int X4(MOTOR motor) {
     // L  L  H  = L  L  L  L  H  L  L  L for MOTOR_HORIZONTAL
     // L  L  L  = H  L  L  L  L  L  L  L for MOTOR_VERTICAL
-    if ((motor != MOTOR_VERTICAL) || (motor != MOTOR_HORIZONTAL)) {
-        printf("%d: Invalid motor\n", __LINE__);
-        return ERROR_INVALID_MOTOR;
-    }
     gpio_set_value(DATA_GPIO, 0);   // echo "0" > /sys/class/gpio/gpio26/value
     gpio_set_value(A0_GPIO, 0);     // echo "0" > /sys/class/gpio/gpio22/value
     gpio_set_value(A1_GPIO, 0);     // echo "0" > /sys/class/gpio/gpio23/value
