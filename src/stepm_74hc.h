@@ -21,6 +21,12 @@
 
 #define USLEEP_TIME 10
 
+typedef enum position_t {
+    MAX_LEFT_POSITION = 0,
+    MAX_RIGHT_POSITION = 1,
+    UNKNOWN_POSITION = -1
+} POSITION;
+
 typedef enum motor_t {
     MOTOR_VERTICAL = 0,
     MOTOR_HORIZONTAL = 1

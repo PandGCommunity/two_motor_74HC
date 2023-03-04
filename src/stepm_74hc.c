@@ -104,6 +104,21 @@ int stepm_74hc_disable(MOTOR motor) {
     return SUCCESS;
 }
 
+int check_position(MOTOR motor) {
+    stepm_74hc_check_motor(motor);
+    int sensors[2][2] = {
+        { STOP_SENSOR_1_LEFT, STOP_SENSOR_1_RIGHT },
+        { STOP_SENSOR_2_LEFT, STOP_SENSOR_2_RIGHT }
+    };
+    int left_status = 0;
+    int right_status = 0;
+    gpio_get_value(sensors[motor][0], &left_status);
+    if (left_status) return MAX_LEFT_POSITION;
+    gpio_get_value(sensors[motor][1], &right_status);
+    if (right_status) return MAX_RIGHT_POSITION;
+    return UNKNOWN_POSITION;
+}
+
 int stepm_74hc_calibrate(MOTOR motor) {
     stepm_74hc_check_motor(motor);
 
@@ -114,8 +129,8 @@ int stepm_74hc_calibrate(MOTOR motor) {
         { STOP_SENSOR_1_LEFT, STOP_SENSOR_1_RIGHT },
         { STOP_SENSOR_2_LEFT, STOP_SENSOR_2_RIGHT }
     };
-    int sensor_side_1 = STOP_SENSOR_1_LEFT;
-    int sensor_side_2 = STOP_SENSOR_1_RIGHT;
+    // int sensor_side_1 = STOP_SENSOR_1_LEFT;
+    // int sensor_side_2 = STOP_SENSOR_1_RIGHT;
     while (!done) {
         int left_old_status, left_new_status = 0;
         int right_old_status, right_new_status = 0;
