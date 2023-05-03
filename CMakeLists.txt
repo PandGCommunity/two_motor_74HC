@@ -12,7 +12,7 @@ include_directories(
 add_definitions(
     -D_DEFAULT_SOURCE
 )
-add_link_options(-Wall -g -Wl,-gc-sections)
+# add_link_options(-Wall -g -Wl,-gc-sections)
 
 set (MAIN_SRC
     ${PROJECT_SOURCE_DIR}/src/main.c
@@ -35,3 +35,6 @@ add_dependencies(${PROJECT} version)
 target_link_libraries(${PROJECT}
 
 )
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+install(TARGETS ${PROJECT} DESTINATION bin)
