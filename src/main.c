@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
         printf("[%d]: %s\n", i, argv[i]);
 
     if (argc < 2) {
-        printf("Usage: %s motor direction count_steps (motor[0..1], count_steps [1..sn] and direction [0..1] is numbers)\n", argv[0]);
+        printf("Usage: %s motor direction count_steps (motor[0..1], direction [0..1] and count_steps [1..sn] is numbers)\n", argv[0]);
         return 0;
     }
 
