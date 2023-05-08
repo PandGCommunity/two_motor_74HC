@@ -4,7 +4,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
-// #include <poll.h>
+#include <poll.h>
+#include <linux/limits.h>
 
  /****************************************************************
  * Constants
@@ -18,6 +19,8 @@
  ****************************************************************/
 int gpio_check(unsigned int gpio);
 int gpio_enable(unsigned int gpio);
+int gpio_poll(unsigned int gpio);
+int gpio_get(int fd, int timeout);
 int gpio_disable(unsigned int gpio);
 int gpio_set_dir(unsigned int gpio, unsigned int out_flag);
 int gpio_set_active_low(unsigned int gpio, unsigned int mode_flag);

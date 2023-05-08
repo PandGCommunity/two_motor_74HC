@@ -53,8 +53,8 @@ static inline int X1(MOTOR motor) {
     gpio_set_value(A0_GPIO, 1);     // echo "1" > /sys/class/gpio/gpio22/value
     gpio_set_value(A1_GPIO, 1);     // echo "0" > /sys/class/gpio/gpio23/value
     gpio_set_value(A2_GPIO, motor); // echo "1 or 0" > /sys/class/gpio/gpio24/value
-    usleep(USLEEP_TIME);
     gpio_set_value(DATA_GPIO, 1);   // echo "1" > /sys/class/gpio/gpio26/value
+    usleep(USLEEP_TIME);
     return SUCCESS;
 }
 
@@ -65,8 +65,8 @@ static inline int X2(MOTOR motor) {
     gpio_set_value(A0_GPIO, 0);     // echo "0" > /sys/class/gpio/gpio22/value
     gpio_set_value(A1_GPIO, 1);     // echo "1" > /sys/class/gpio/gpio23/value
     gpio_set_value(A2_GPIO, motor); // echo "1 or 0" > /sys/class/gpio/gpio24/value
-    usleep(USLEEP_TIME);
     gpio_set_value(DATA_GPIO, 1);   // echo "1" > /sys/class/gpio/gpio26/value
+    usleep(USLEEP_TIME);
     return SUCCESS;
 }
 
@@ -77,8 +77,8 @@ static inline int X3(MOTOR motor) {
     gpio_set_value(A0_GPIO, 1);     // echo "1" > /sys/class/gpio/gpio22/value
     gpio_set_value(A1_GPIO, 0);     // echo "0" > /sys/class/gpio/gpio23/value
     gpio_set_value(A2_GPIO, motor); // echo "1 or 0" > /sys/class/gpio/gpio24/value
-    usleep(USLEEP_TIME);
     gpio_set_value(DATA_GPIO, 1);   // echo "1" > /sys/class/gpio/gpio26/value
+    usleep(USLEEP_TIME);
     return SUCCESS;
 }
 
@@ -89,8 +89,8 @@ static inline int X4(MOTOR motor) {
     gpio_set_value(A0_GPIO, 0);     // echo "0" > /sys/class/gpio/gpio22/value
     gpio_set_value(A1_GPIO, 0);     // echo "0" > /sys/class/gpio/gpio23/value
     gpio_set_value(A2_GPIO, motor); // echo "1 or 0" > /sys/class/gpio/gpio24/value
-    usleep(USLEEP_TIME);
     gpio_set_value(DATA_GPIO, 1);   // echo "1" > /sys/class/gpio/gpio26/value
+    usleep(USLEEP_TIME);
     return SUCCESS;
 }
 
@@ -119,48 +119,78 @@ int check_position(MOTOR motor) {
     return UNKNOWN_POSITION;
 }
 
-int stepm_74hc_calibrate(MOTOR motor) {
-    stepm_74hc_check_motor(motor);
+int goto_end(MOTOR motor, DIRECTION dir, int sensor_fd) {
+    int quit = 0;
+    int steps = 0;
 
-    int done = 0;
-    int counter = 0;
+    while (!quit) {
+        steps++;
+        stepm_74hc_step(motor, dir);
+        int result = gpio_get(sensor_fd, POLL_WAIT_TIME);
+        if (result != -1) {
+            // fprintf(stderr, "gpio triggered == %i\n", result);
+            quit = 1;
+        }
+    }
+    return steps;
+}
+
+CALIBRATION stepm_74hc_calibrate(MOTOR motor) {
+    stepm_74hc_check_motor(motor);
 
     int sensors[2][2] = {
         { STOP_SENSOR_1_LEFT, STOP_SENSOR_1_RIGHT },
         { STOP_SENSOR_2_LEFT, STOP_SENSOR_2_RIGHT }
     };
-    // int sensor_side_1 = STOP_SENSOR_1_LEFT;
-    // int sensor_side_2 = STOP_SENSOR_1_RIGHT;
-    while (!done) {
-        int left_old_status, left_new_status = 0;
-        int right_old_status, right_new_status = 0;
-        gpio_get_value(sensors[motor][0], &left_old_status);
-        gpio_get_value(sensors[motor][1], &right_old_status);
-        stepm_74hc_step(motor, DIRECTION_CLOCKWISE);
-        gpio_get_value(sensors[motor][0], &left_new_status);
-        gpio_get_value(sensors[motor][1], &right_new_status);
-        if ((left_old_status != left_new_status) || (right_old_status != right_new_status)) {
-            done = 1;
-        }
-    }
 
-    done = 0;
-    while (!done) {
-        counter++;
-        int left_old_status, left_new_status = 0;
-        int right_old_status, right_new_status = 0;
-        gpio_get_value(sensors[motor][0], &left_old_status);
-        gpio_get_value(sensors[motor][1], &right_old_status);
-        stepm_74hc_step(motor, DIRECTION_UCLOCKWISE);
-        gpio_get_value(sensors[motor][0], &left_new_status);
-        gpio_get_value(sensors[motor][1], &right_new_status);
-        if ((left_old_status != left_new_status) || (right_old_status != right_new_status)) {
-            done = 1;
-        }
+    gpio_set_edge(STOP_SENSOR_1_LEFT,  "rising");
+    gpio_set_edge(STOP_SENSOR_1_RIGHT, "rising");
+    gpio_set_edge(STOP_SENSOR_2_LEFT,  "rising");
+    gpio_set_edge(STOP_SENSOR_2_RIGHT, "rising");
 
+    // gpio_set_active_low(STOP_SENSOR_1_LEFT,  1);
+    // gpio_set_active_low(STOP_SENSOR_1_RIGHT, 1);
+    // gpio_set_active_low(STOP_SENSOR_2_LEFT,  1);
+    // gpio_set_active_low(STOP_SENSOR_2_RIGHT, 1);
+
+    int left_1_fd  = gpio_poll(STOP_SENSOR_1_LEFT);
+    int right_1_fd = gpio_poll(STOP_SENSOR_1_RIGHT);
+    int left_2_fd  = gpio_poll(STOP_SENSOR_2_LEFT);
+    int right_2_fd = gpio_poll(STOP_SENSOR_2_RIGHT);
+
+    int fds[2][2] = {
+        left_2_fd,
+        right_2_fd,
+        left_1_fd,
+        right_1_fd
+    };
+
+    CALIBRATION ssf = {
+        {
+            .sensor_fd = fds[motor][0],
+            .dir = DIRECTION_UCLOCKWISE,
+        }, {
+            .sensor_fd = fds[motor][1],
+            .dir = DIRECTION_CLOCKWISE
+        },
+        .motor = motor,
+        .max_steps = 0,
+        .current_position = 0
+    };
+
+    goto_end(ssf.motor, ssf.info1.dir, ssf.info1.sensor_fd);
+
+    ssf.max_steps = goto_end(ssf.motor, ssf.info2.dir, ssf.info2.sensor_fd);
+
+    printf("%d: Motor steps: %d\n", __LINE__, ssf.max_steps);
+    printf("%d: done, go to center\n", __LINE__);
+
+    for (int i = 0; i < ssf.max_steps / 2; ++i) {
+        stepm_74hc_step(motor, ssf.info1.dir);
     }
-    printf("%d: Motor steps: %d\n", __LINE__, counter);
-    return 0;
+    ssf.current_position = ssf.max_steps / 2;
+
+    return ssf;
 }
 
 int stepm_74hc_step(MOTOR motor, DIRECTION dir) {

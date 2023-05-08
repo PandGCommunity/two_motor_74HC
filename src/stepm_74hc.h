@@ -14,12 +14,13 @@
 #define A1_GPIO 23      // address input
 #define A2_GPIO 24      // address input
 
-#define STOP_SENSOR_1_LEFT      17
-#define STOP_SENSOR_1_RIGHT     18
-#define STOP_SENSOR_2_LEFT      19
-#define STOP_SENSOR_2_RIGHT     20
+#define STOP_SENSOR_1_LEFT      19 // Horizontal
+#define STOP_SENSOR_1_RIGHT     20 // Horizontal
+#define STOP_SENSOR_2_LEFT      18 // Vertical
+#define STOP_SENSOR_2_RIGHT     17 // Vertical
 
-#define USLEEP_TIME 10
+#define POLL_WAIT_TIME 14
+#define USLEEP_TIME 1600 // - POLL_WAIT_TIME
 
 typedef enum position_t {
     MAX_LEFT_POSITION = 0,
@@ -42,6 +43,20 @@ typedef enum errors_t {
     ERROR_INVALID_MOTOR = -1,
     ERROR_INVALID_DIRECTION = -2
 } ERROR;
+
+
+typedef struct calibration_info_t {
+    int sensor_fd;
+    DIRECTION dir;
+} CALIBRATION_INFO;
+
+typedef struct calibration_t {
+    CALIBRATION_INFO info1;
+    CALIBRATION_INFO info2;
+    MOTOR motor;
+    int max_steps;
+    int current_position;
+} CALIBRATION;
 
 
 // A0 A1 A2 = Q0 Q1 Q2 Q3 Q4 Q5 Q6 Q7
@@ -69,7 +84,7 @@ int stepm_74hc_init_pawls(unsigned motor, unsigned gpio_margin_A, unsigned gpio_
 
 int stepm_74hc_rotate(unsigned motor, int direction, unsigned steps_count);
 
-int stepm_74hc_calibrate(MOTOR motor);
+CALIBRATION stepm_74hc_calibrate(MOTOR motor);
 
 int stepm_74hc_get_max_position(unsigned motor);
 int stepm_74hc_get_cur_position(unsigned motor);

@@ -1,6 +1,9 @@
 #include "stepm_74hc.h"
 #include "app_version.h"
 
+
+#define smart_log(...) ( fprintf(stderr, "[%s]: ", __func__) , printf(__VA_ARGS__) )
+
 int main(int argc, char *argv[]) {
     printf("[%s] version: %s\n", argv[0], APP_VERSION);
 
@@ -26,12 +29,16 @@ int main(int argc, char *argv[]) {
     stepm_74hc_disable(MOTOR_HORIZONTAL);
     stepm_74hc_disable(MOTOR_VERTICAL);
 
+    CALIBRATION horizontal, vertical;
+    horizontal = stepm_74hc_calibrate(MOTOR_HORIZONTAL);
+    vertical = stepm_74hc_calibrate(MOTOR_VERTICAL);
+
     for (int i = 0; i < count; ++i) {
         stepm_74hc_step(motor, dir);
     }
 
-    // stepm_74hc_disable(MOTOR_HORIZONTAL);
-    // stepm_74hc_disable(MOTOR_VERTICAL);
+    stepm_74hc_disable(MOTOR_HORIZONTAL);
+    stepm_74hc_disable(MOTOR_VERTICAL);
     stepm_74hc_gpio_deinit();
     return 0;
 }

@@ -5,11 +5,11 @@
  ****************************************************************/
 int gpio_check(unsigned int gpio) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
 
-    len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR  "/gpio%d", gpio);
+    len = snprintf(filename, sizeof(filename), SYSFS_GPIO_DIR  "/gpio%d", gpio);
 
-    if (access(buf, F_OK) == 0) {
+    if (access(filename, F_OK) == 0) {
         return 1;
     } else {
         return 0;
@@ -17,11 +17,51 @@ int gpio_check(unsigned int gpio) {
 }
 
 /****************************************************************
+ * gpio_poll set GPIO line polling mode
+ ****************************************************************/
+int gpio_poll(unsigned int gpio) {
+    char filename[PATH_MAX];
+    int fd;
+    char c;
+    int err;
+
+    snprintf(filename, sizeof(filename), SYSFS_GPIO_DIR  "/gpio%d/value", gpio);
+    fd = open(filename, O_RDONLY);
+    if (fd < 0) return -1;
+
+    read(fd, &c, sizeof(c));
+
+    return fd;
+}
+
+/****************************************************************
+ * gpio_enable
+ ****************************************************************/// get GPIO line value
+int gpio_get(int fd, int timeout) {
+    struct pollfd pollfd[1];
+    char c;
+    int err;
+
+    pollfd[0].fd = fd;
+    pollfd[0].events = POLLPRI | POLLERR;
+    pollfd[0].revents = 0;
+
+    err =  poll(pollfd, 1, timeout);
+    if(err != 1) return -1;
+
+    lseek(fd, 0, SEEK_SET);
+    err = read(fd, &c, sizeof(c));
+    if(err != 1) return -1;
+
+    return c - '0';
+}
+
+/****************************************************************
  * gpio_enable
  ****************************************************************/
 int gpio_enable(unsigned int gpio) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
 
     fd = open(SYSFS_GPIO_DIR "/export", O_WRONLY);
     if (fd < 0) {
@@ -29,8 +69,8 @@ int gpio_enable(unsigned int gpio) {
         return fd;
     }
 
-    len = snprintf(buf, sizeof(buf), "%d", gpio);
-    write(fd, buf, len);
+    len = snprintf(filename, sizeof(filename), "%d", gpio);
+    write(fd, filename, len);
     close(fd);
 
     return 0;
@@ -41,7 +81,7 @@ int gpio_enable(unsigned int gpio) {
  ****************************************************************/
 int gpio_disable(unsigned int gpio) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
 
     fd = open(SYSFS_GPIO_DIR "/unexport", O_WRONLY);
     if (fd < 0) {
@@ -49,8 +89,8 @@ int gpio_disable(unsigned int gpio) {
         return fd;
     }
 
-    len = snprintf(buf, sizeof(buf), "%d", gpio);
-    write(fd, buf, len);
+    len = snprintf(filename, sizeof(filename), "%d", gpio);
+    write(fd, filename, len);
     close(fd);
     return 0;
 }
@@ -60,11 +100,11 @@ int gpio_disable(unsigned int gpio) {
  ****************************************************************/
 int gpio_set_dir(unsigned int gpio, unsigned int out_flag) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
 
-    len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR  "/gpio%d/direction", gpio);
+    len = snprintf(filename, sizeof(filename), SYSFS_GPIO_DIR  "/gpio%d/direction", gpio);
 
-    fd = open(buf, O_WRONLY);
+    fd = open(filename, O_WRONLY);
     if (fd < 0) {
         perror("gpio/direction");
         return fd;
@@ -84,11 +124,11 @@ int gpio_set_dir(unsigned int gpio, unsigned int out_flag) {
  ****************************************************************/
 int gpio_set_active_low(unsigned int gpio, unsigned int mode_flag) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
 
-    len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR  "/gpio%d/active_low", gpio);
+    len = snprintf(filename, sizeof(filename), SYSFS_GPIO_DIR  "/gpio%d/active_low", gpio);
 
-    fd = open(buf, O_WRONLY);
+    fd = open(filename, O_WRONLY);
     if (fd < 0) {
         perror("gpio/active_low");
         return fd;
@@ -108,11 +148,11 @@ int gpio_set_active_low(unsigned int gpio, unsigned int mode_flag) {
  ****************************************************************/
 int gpio_set_value(unsigned int gpio, unsigned int value) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
 
-    len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
+    len = snprintf(filename, sizeof(filename), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
 
-    fd = open(buf, O_WRONLY);
+    fd = open(filename, O_WRONLY);
     if (fd < 0) {
         perror("gpio/set-value");
         return fd;
@@ -132,12 +172,12 @@ int gpio_set_value(unsigned int gpio, unsigned int value) {
  ****************************************************************/
 int gpio_get_value(unsigned int gpio, unsigned int *value) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
     char ch;
 
-    len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
+    len = snprintf(filename, sizeof(filename), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
 
-    fd = open(buf, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0) {
         perror("gpio/get-value");
         return fd;
@@ -162,11 +202,11 @@ int gpio_get_value(unsigned int gpio, unsigned int *value) {
 
 int gpio_set_edge(unsigned int gpio, char *edge) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
 
-    len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/edge", gpio);
+    len = snprintf(filename, sizeof(filename), SYSFS_GPIO_DIR "/gpio%d/edge", gpio);
 
-    fd = open(buf, O_WRONLY);
+    fd = open(filename, O_WRONLY);
     if (fd < 0) {
         perror("gpio/set-edge");
         return fd;
@@ -183,11 +223,11 @@ int gpio_set_edge(unsigned int gpio, char *edge) {
 
 int gpio_fd_open(unsigned int gpio) {
     int fd, len;
-    char buf[MAX_BUF];
+    char filename[PATH_MAX];
 
-    len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
+    len = snprintf(filename, sizeof(filename), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
 
-    fd = open(buf, O_RDONLY | O_NONBLOCK );
+    fd = open(filename, O_RDONLY | O_NONBLOCK );
     if (fd < 0) {
         perror("gpio/fd_open");
     }
